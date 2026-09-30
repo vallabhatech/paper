@@ -40,13 +40,11 @@ chbhavani99@gmail.com}
 \maketitle
 
 \begin{abstract}
-% TODO: Replace this note with a concise summary of the problem, method,
-% dataset, key measured results, and conclusion. Do not report unmeasured results.
-This paper investigates convolutional neural networks for detecting deepfake media. The abstract must be completed after the experimental method and results are finalized.
+The increasing realism of deepfake videos complicates the verification of digital media. This paper describes a deepfake video detection framework that combines a convolutional neural network (CNN) with a Convolutional Block Attention Module (CBAM) to emphasize informative facial features. The proposed pipeline samples video frames, detects and crops faces, normalizes facial images, and classifies them as authentic or manipulated. Grad-CAM is included to visualize image regions that influence predictions. The evaluation protocol is designed to report accuracy, precision, recall, F1-score, ROC-AUC, and confusion matrices; compare the attention model with an equivalent CNN without attention; test cross-dataset generalization from FaceForensics++ to Celeb-DF; and assess performance after compression and resolution reduction. A FastAPI service and web frontend are specified for video submission and result presentation. Numerical experimental results and implementation-specific model settings were not available for this draft, so no performance claims are made.
 \end{abstract}
 
 \begin{IEEEkeywords}
-deepfake detection, convolutional neural networks, digital forensics, image classification
+deepfake detection, attention mechanisms, CBAM, video forensics, media authentication
 \end{IEEEkeywords}
 
 \input{sections/introduction}

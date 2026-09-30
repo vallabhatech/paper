@@ -1,14 +1,15 @@
 \section{Introduction}
 
-The growing quality and accessibility of face-manipulation tools have made it increasingly difficult to distinguish authentic media from manipulated content by visual inspection alone. This creates practical concerns for digital forensics, journalism, and online platforms. Research datasets such as FaceForensics++ and Celeb-DF have helped make the problem measurable and have enabled systematic comparison of detection methods \cite{rossler2019faceforensics,li2020celebdf}.
+The growing quality and accessibility of deep-learning-based face manipulation have made it increasingly difficult to distinguish authentic videos from manipulated content by visual inspection alone. Deepfakes can be misused for misinformation, impersonation fraud, and non-consensual content, while uncertainty about authenticity can also undermine trust in genuine media. These risks motivate practical detection methods for digital forensics, journalism, cybersecurity, and content moderation.
 
-Convolutional neural networks (CNNs) are a natural approach to this task because they can learn visual representations directly from image data. However, a detector's measured performance can depend on the manipulation methods, data split, compression, and evaluation protocol. Results on one dataset should therefore not be treated as proof of generalization to unseen sources.
+CNN-based detectors learn visual representations from facial images and video frames. However, subtle manipulation traces may be concentrated around facial regions such as the eyes, mouth, and blending boundaries. A conventional CNN does not explicitly encode which spatial features should receive greater emphasis. In addition, measured performance depends on manipulation types, dataset composition, split design, compression, and evaluation protocol. Strong results on one benchmark alone do not establish generalization to other datasets or real-world video conditions.
 
-This paper studies a CNN-based approach to deepfake detection. The final version should specify the exact input modality (images, sampled video frames, or both), dataset, model, and evaluation setting. The contributions should be stated here only after they are supported by the completed experiments:
+This paper presents a framework for deepfake video detection using a CNN augmented with a Convolutional Block Attention Module (CBAM). Its intended pipeline extracts frames from a submitted video, detects and crops faces, normalizes the resulting images, and classifies facial content. The framework also includes Grad-CAM visualizations and a web application architecture with a FastAPI backend. Its evaluation plan covers in-domain metrics, a no-attention ablation, cross-dataset testing, and degraded-video conditions. The contributions of this work are:
 \begin{itemize}
-    \item TODO: State the detector or training approach implemented in this study.
-    \item TODO: State the dataset and evaluation protocol used.
-    \item TODO: Summarize the verified result or comparison that constitutes the contribution.
+    \item A video-level detection pipeline design that combines facial preprocessing with CNN feature extraction and CBAM attention.
+    \item An evaluation protocol for independently examining attention, cross-dataset transfer from FaceForensics++ to Celeb-DF, and robustness to compression and reduced resolution.
+    \item An explainability and deployment design that pairs Grad-CAM visualizations with a FastAPI prediction service and a web-based results interface.
 \end{itemize}
+These contributions describe the proposed framework and evaluation design. The available project material does not include completed experimental results or enough implementation details to reproduce a specific trained model; accordingly, this paper does not claim measured improvements.
 
 The remainder of this paper is organized as follows. Section II reviews related work. Section III describes the proposed method. Section IV presents the experimental setup, Section V reports results, and Section VI concludes the paper.

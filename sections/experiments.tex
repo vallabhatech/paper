@@ -1,18 +1,18 @@
 \section{Experimental Setup}
 
 \subsection{Dataset and Splits}
-TODO: Name the dataset and version, describe the number of authentic and manipulated samples, list manipulation categories, and state the train/validation/test counts. Explain how the split avoids leakage between related frames, videos, or identities. Report any class balancing or filtering.
+FaceForensics++ is designated as the primary dataset for training and in-domain evaluation, with Celeb-DF reserved for cross-dataset testing. The supplied project description does not identify dataset versions, compression settings, sample counts, manipulation categories included, or actual partition counts. These must be reported from the data used in the final run. Splits should be performed at the source-video level, and, where applicable, identities should not overlap between training and test partitions. All sampled frames from a video must remain in the same partition to prevent leakage. Any filtering, class balancing, or label mapping must also be documented.
 
 \subsection{Implementation Details}
-TODO: Report the framework and version, hardware, input resolution, optimizer, learning rate, batch size, epoch count, augmentation, random seed, and model-selection rule. Include enough information for another researcher to reproduce the run.
+The proposed software stack uses Python and PyTorch with torchvision for model and image-processing components, OpenCV for video decoding and frame extraction, and FastAPI for the prediction service. MediaPipe or MTCNN is identified as a possible face detector, but the selected implementation is not specified. The project description also names scikit-learn for metric computation and a web frontend for presenting results. Framework versions, exact hardware, backbone, input resolution, optimizer, learning rate, batch size, epochs, augmentation parameters, random seed, checkpoint-selection rule, and trained model weights were not supplied. These values are necessary for reproducing and interpreting an experimental result.
 
 \subsection{Evaluation Metrics}
-Report at least accuracy, precision, recall, and F1-score, with the positive class explicitly defined. Include ROC-AUC where prediction scores are available. For a binary classifier, precision and recall are
+The evaluation protocol reports accuracy, precision, recall, F1-score, ROC-AUC, and a confusion matrix, with manipulated video defined as the positive class. For a binary classifier, precision and recall are
 \begin{equation}
     \mathrm{Precision}=\frac{TP}{TP+FP}, \qquad
     \mathrm{Recall}=\frac{TP}{TP+FN},
 \end{equation}
-where $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively. State whether metrics are computed per frame or per video.
+where $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively. Metrics should be computed at the video level using the aggregated video prediction, and this unit should be kept consistent across comparisons. ROC-AUC should use continuous prediction scores rather than thresholded labels.
 
-\subsection{Baselines}
-TODO: Identify the baselines actually evaluated and ensure every method uses the same data split and evaluation protocol. Do not list a method as a baseline unless it was run or its results are taken from a directly comparable published setting.
+\subsection{Ablation, Generalization, and Robustness}
+The attention ablation compares the CBAM model with an otherwise equivalent CNN without attention, using identical splits, preprocessing, training budget, and evaluation metrics. Cross-dataset generalization is assessed by training on FaceForensics++ and testing on Celeb-DF without fitting to the target test set. Robustness is assessed by evaluating copies of test videos after controlled compression and spatial downsampling; codec, compression quality, target resolution, and any resizing applied before inference must be recorded. No baseline or test result should be presented unless the corresponding experiment has been run under a documented protocol.

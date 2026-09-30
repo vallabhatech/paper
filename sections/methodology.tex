@@ -1,26 +1,26 @@
 \section{Methodology}
 
 \subsection{System Overview}
-The detector should be described from input to prediction, including any face detection, frame sampling, resizing, normalization, CNN inference, and aggregation of frame-level predictions into a video-level decision. Fig.~\ref{fig:workflow} is optional and will appear when \texttt{figures/workflow.png} is added.
+The proposed system accepts a video through a web interface and processes it through a FastAPI backend. The backend extracts frames, detects and crops facial regions, resizes and normalizes face images, and passes them to the classifier. The model produces frame-level predictions; a video-level prediction is then formed by aggregating those scores. The aggregation rule, frame-sampling rate, face detector, input dimensions, and behavior when no face is detected must be fixed and reported by the implementation. Data augmentation is applied during training only, with transformations selected to preserve the class label. The prediction, confidence score, and selected Grad-CAM visualization are returned to the frontend for display.
 
 \begin{figure}[t]
     \centering
     \IfFileExists{figures/workflow.png}{
         \includegraphics[width=\linewidth]{workflow.png}
     }{\fbox{\parbox{0.9\linewidth}{\centering Add the workflow diagram as\\\texttt{figures/workflow.png}}}}
-    \caption{Workflow of the deepfake detection system. Replace this placeholder with the implemented pipeline.}
+    \caption{Proposed video detection workflow from upload and facial preprocessing to classification and visual explanation.}
     \label{fig:workflow}
 \end{figure}
 
 \subsection{CNN Architecture}
-TODO: Name the architecture and give enough detail to reproduce it: input dimensions, layers or pretrained backbone, classifier head, initialization, and number of trainable parameters. If using a published architecture, cite its original work. Fig.~\ref{fig:architecture} is an optional architecture diagram.
+The detector is designed as a CNN backbone augmented with CBAM. For an intermediate feature tensor, CBAM first infers channel-wise weights and then spatial weights, refining the features before classification \cite{woo2018cbam}. The project description identifies Xception and ResNet as candidate backbones but does not specify which one was selected, nor does it provide the classifier head, input dimensions, initialization, or parameter count. These details must be recorded for a reproducible implementation; no particular backbone or trained configuration is assumed here. The ablation model should use the same backbone, classifier, data, and training protocol, with CBAM as the only architectural difference. Fig.~\ref{fig:architecture} is optional.
 
 \begin{figure}[t]
     \centering
     \IfFileExists{figures/architecture.png}{
         \includegraphics[width=\linewidth]{architecture.png}
     }{\fbox{\parbox{0.9\linewidth}{\centering Add the architecture diagram as\\\texttt{figures/architecture.png}}}}
-    \caption{CNN architecture used in this study. Replace this placeholder with the actual model.}
+    \caption{Conceptual CNN and CBAM architecture. The final diagram should reflect the selected implementation.}
     \label{fig:architecture}
 \end{figure}
 
@@ -30,7 +30,10 @@ For binary classification, a common objective is binary cross-entropy:
     \mathcal{L}=-\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log(p_i)+(1-y_i)\log(1-p_i)\right],
     \label{eq:bce}
 \end{equation}
-where $N$ is the number of training examples, $y_i\in\{0,1\}$ is the ground-truth label, and $p_i$ is the predicted probability for class 1. TODO: Confirm that this matches the implemented loss; otherwise replace it and define the actual objective.
+where $N$ is the number of training examples, $y_i\in\{0,1\}$ is the ground-truth label, and $p_i$ is the predicted probability for class 1. Binary cross-entropy is the intended objective for binary classification; the final report should confirm the loss and any class weighting used by the training code.
 
 \subsection{Inference}
-TODO: Specify the decision threshold and, for video input, how frame predictions are combined. State how failed face detection or invalid frames are handled.
+For each detected face, the classifier returns a score for the manipulated class. A decision threshold converts this score to a frame-level label, and an aggregation rule combines frame scores into the video-level confidence and label. Neither the threshold nor the aggregation rule is specified in the supplied project description, so both are implementation details that must be stated before reporting video-level metrics. Grad-CAM is computed for a selected convolutional layer and overlaid on the corresponding face crop to visualize regions contributing to the prediction \cite{selvaraju2017gradcam}. Heatmaps are explanatory visualizations and are not independent evidence of manipulation.
+
+\subsection{Application Architecture}
+The application is organized into a video-upload frontend, a FastAPI service, video and face preprocessing, model inference, Grad-CAM generation, and a result dashboard. The service packages the predicted label, confidence score, and visualization for the frontend. This architecture describes the intended end-to-end workflow; deployment performance, supported file limits, and operational behavior should be reported after they are verified in the running application.
