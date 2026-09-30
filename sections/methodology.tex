@@ -1,0 +1,36 @@
+\section{Methodology}
+
+\subsection{System Overview}
+The detector should be described from input to prediction, including any face detection, frame sampling, resizing, normalization, CNN inference, and aggregation of frame-level predictions into a video-level decision. Fig.~\ref{fig:workflow} is optional and will appear when \texttt{figures/workflow.png} is added.
+
+\begin{figure}[t]
+    \centering
+    \IfFileExists{figures/workflow.png}{
+        \includegraphics[width=\linewidth]{workflow.png}
+    }{\fbox{\parbox{0.9\linewidth}{\centering Add the workflow diagram as\\\texttt{figures/workflow.png}}}}
+    \caption{Workflow of the deepfake detection system. Replace this placeholder with the implemented pipeline.}
+    \label{fig:workflow}
+\end{figure}
+
+\subsection{CNN Architecture}
+TODO: Name the architecture and give enough detail to reproduce it: input dimensions, layers or pretrained backbone, classifier head, initialization, and number of trainable parameters. If using a published architecture, cite its original work. Fig.~\ref{fig:architecture} is an optional architecture diagram.
+
+\begin{figure}[t]
+    \centering
+    \IfFileExists{figures/architecture.png}{
+        \includegraphics[width=\linewidth]{architecture.png}
+    }{\fbox{\parbox{0.9\linewidth}{\centering Add the architecture diagram as\\\texttt{figures/architecture.png}}}}
+    \caption{CNN architecture used in this study. Replace this placeholder with the actual model.}
+    \label{fig:architecture}
+\end{figure}
+
+\subsection{Training Objective}
+For binary classification, a common objective is binary cross-entropy:
+\begin{equation}
+    \mathcal{L}=-\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log(p_i)+(1-y_i)\log(1-p_i)\right],
+    \label{eq:bce}
+\end{equation}
+where $N$ is the number of training examples, $y_i\in\{0,1\}$ is the ground-truth label, and $p_i$ is the predicted probability for class 1. TODO: Confirm that this matches the implemented loss; otherwise replace it and define the actual objective.
+
+\subsection{Inference}
+TODO: Specify the decision threshold and, for video input, how frame predictions are combined. State how failed face detection or invalid frames are handled.

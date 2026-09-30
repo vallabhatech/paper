@@ -1,0 +1,18 @@
+\section{Experimental Setup}
+
+\subsection{Dataset and Splits}
+TODO: Name the dataset and version, describe the number of authentic and manipulated samples, list manipulation categories, and state the train/validation/test counts. Explain how the split avoids leakage between related frames, videos, or identities. Report any class balancing or filtering.
+
+\subsection{Implementation Details}
+TODO: Report the framework and version, hardware, input resolution, optimizer, learning rate, batch size, epoch count, augmentation, random seed, and model-selection rule. Include enough information for another researcher to reproduce the run.
+
+\subsection{Evaluation Metrics}
+Report at least accuracy, precision, recall, and F1-score, with the positive class explicitly defined. Include ROC-AUC where prediction scores are available. For a binary classifier, precision and recall are
+\begin{equation}
+    \mathrm{Precision}=\frac{TP}{TP+FP}, \qquad
+    \mathrm{Recall}=\frac{TP}{TP+FN},
+\end{equation}
+where $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively. State whether metrics are computed per frame or per video.
+
+\subsection{Baselines}
+TODO: Identify the baselines actually evaluated and ensure every method uses the same data split and evaluation protocol. Do not list a method as a baseline unless it was run or its results are taken from a directly comparable published setting.

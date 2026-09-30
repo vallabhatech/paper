@@ -1,0 +1,10 @@
+\section{Related Work}
+
+\subsection{Deepfake Datasets}
+FaceForensics++ provides manipulated facial videos and a benchmark for evaluating forgery-detection methods \cite{rossler2019faceforensics}. Celeb-DF was introduced as a challenging dataset with higher-quality synthesized videos, highlighting the difficulty of detecting realistic manipulations \cite{li2020celebdf}. Dataset choice and partitioning matter: overlapping identities or source videos across training and test sets can produce overly optimistic estimates of generalization. This study must document its split strategy and any preprocessing applied.
+
+\subsection{CNN-Based Detection}
+CNN-based systems learn visual patterns that may distinguish manipulated from authentic media. Xception uses depthwise separable convolutions and has been used as a strong image-classification architecture \cite{chollet2017xception}. MesoNet was designed as a compact network for facial video forgery detection \cite{afchar2018mesonet}. These works motivate CNNs as candidate detectors, but performance comparisons are meaningful only when datasets, splits, preprocessing, and metrics are clearly reported.
+
+\subsection{Positioning of This Study}
+TODO: Identify the specific gap this implementation addresses and compare it with the closest prior work. Avoid claiming novelty unless the distinction is supported by a literature review and the experiments.
