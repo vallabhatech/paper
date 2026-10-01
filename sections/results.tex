@@ -2,16 +2,16 @@
 
 The supplied project material describes the intended metrics and evaluation scenarios but does not include completed runs, prediction outputs, or verified numerical measurements. Consequently, this section does not report accuracy, precision, recall, F1-score, ROC-AUC, confusion matrices, or comparative gains. Such values cannot be inferred from the proposed architecture or evaluation plan.
 
-The final evaluation should report in-domain results on the held-out FaceForensics++ test partition, the matched no-CBAM ablation, and cross-dataset results on Celeb-DF. Compression and reduced-resolution results should be presented alongside the unmodified test condition, with the degradation settings specified. The discussion should analyze false positives and false negatives, distinguish within-dataset performance from cross-dataset transfer, and limit conclusions to the tested data and conditions. Fig.~\ref{fig:results} can present measured results once the experiments are complete.
+The final evaluation should report in-domain results on the held-out FaceForensics++ test partition, the matched no-CBAM ablation, and cross-dataset results on Celeb-DF. Compression and reduced-resolution results should be presented alongside the unmodified test condition, with the degradation settings specified. The discussion should analyze false positives and false negatives, distinguish within-dataset performance from cross-dataset transfer, and limit conclusions to the tested data and conditions.
 
-\begin{figure}[t]
-    \centering
-    \IfFileExists{figures/results.png}{
+\IfFileExists{figures/results.png}{
+    \begin{figure}[t]
+        \centering
         \includegraphics[width=\linewidth]{results.png}
-    }{\fbox{\parbox{0.9\linewidth}{\centering Add a results plot as\\\texttt{figures/results.png}}}}
-    \caption{Evaluation results; populate this figure only with measurements from completed experiments.}
-    \label{fig:results}
-\end{figure}
+        \caption{Evaluation results from completed experiments.}
+        \label{fig:results}
+    \end{figure}
+}{}
 
 \subsection{Limitations}
 The present draft is limited by the absence of a confirmed backbone configuration, training details, data split counts, and experimental measurements. The proposed evaluation also covers only the named datasets and degradation settings; it cannot establish performance across all manipulation methods, populations, or distribution shifts. Compression and resolution changes may remove or alter visual cues, while face-detection errors and frame aggregation can affect video-level decisions. Demographic effects, calibration, and operational latency remain unmeasured in the available material. These are limitations of the evidence currently documented, not findings about the model's measured behavior.

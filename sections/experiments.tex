@@ -12,7 +12,37 @@ The evaluation protocol reports accuracy, precision, recall, F1-score, ROC-AUC, 
     \mathrm{Precision}=\frac{TP}{TP+FP}, \qquad
     \mathrm{Recall}=\frac{TP}{TP+FN},
 \end{equation}
-where $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively. Metrics should be computed at the video level using the aggregated video prediction, and this unit should be kept consistent across comparisons. ROC-AUC should use continuous prediction scores rather than thresholded labels.
+where $TP$, $FP$, and $FN$ denote true positives, false positives, and false negatives, respectively. Accuracy and F1-score are
+\begin{equation}
+    \begin{aligned}
+        \mathrm{Accuracy}&=\frac{TP+TN}{TP+TN+FP+FN},\\
+        \mathrm{F1}&=2\frac{\mathrm{Precision}\cdot\mathrm{Recall}}
+        {\mathrm{Precision}+\mathrm{Recall}}.
+    \end{aligned}
+\end{equation}
+The confusion matrix is organized with actual labels by row and predicted labels by column:
+\begin{table}[t]
+    \caption{Binary confusion matrix; the manipulated class is positive.}
+    \label{tab:confusion-matrix}
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        & Predicted Real & Predicted Fake \\
+        \midrule
+        Actual Real & $TN$ & $FP$ \\
+        Actual Fake & $FN$ & $TP$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+The receiver operating characteristic (ROC) curve evaluates the true-positive rate (TPR) against the false-positive rate (FPR) over decision thresholds:
+\begin{equation}
+    \begin{aligned}
+        \mathrm{TPR}&=\frac{TP}{TP+FN},\qquad
+        \mathrm{FPR}=\frac{FP}{FP+TN},\\
+        \mathrm{AUC}&=\int_{0}^{1}\mathrm{TPR}(u)\,du.
+    \end{aligned}
+\end{equation}
+where $u$ denotes FPR. Metrics should be computed at the video level using the aggregated video prediction, and this unit should be kept consistent across comparisons. ROC-AUC should use continuous prediction scores rather than thresholded labels.
 
 \subsection{Ablation, Generalization, and Robustness}
-The attention ablation compares the CBAM model with an otherwise equivalent CNN without attention, using identical splits, preprocessing, training budget, and evaluation metrics. Cross-dataset generalization is assessed by training on FaceForensics++ and testing on Celeb-DF without fitting to the target test set. Robustness is assessed by evaluating copies of test videos after controlled compression and spatial downsampling; codec, compression quality, target resolution, and any resizing applied before inference must be recorded. No baseline or test result should be presented unless the corresponding experiment has been run under a documented protocol.
+The attention ablation compares the CBAM model with an otherwise equivalent CNN without attention, using identical splits, preprocessing, training budget, and evaluation metrics. Cross-dataset generalization is assessed by training on FaceForensics++ and testing on Celeb-DF without fitting to the target test set. For robustness, let $\mathcal{D}$ denote a specified video degradation, such as compression or spatial downsampling. The transformed test input is $V_{d}=\mathcal{D}(V)$; performance on $V_d$ is compared with performance on the original $V$ using the same trained model and decision protocol. Codec, compression quality, target resolution, and any resizing applied before inference must be recorded. No baseline or test result should be presented unless the corresponding experiment has been run under a documented protocol.

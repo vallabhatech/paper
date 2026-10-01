@@ -2,6 +2,7 @@
 \citation{rossler2019faceforensics}
 \citation{li2020celebdf}
 \citation{chollet2017xception}
+\citation{he2016deep}
 \citation{afchar2018mesonet}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{}\protected@file@percent }
@@ -9,33 +10,49 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Benchmark Datasets}{1}{}\protected@file@percent }
 \citation{woo2018cbam}
 \citation{selvaraju2017gradcam}
-\citation{woo2018cbam}
-\citation{selvaraju2017gradcam}
+\citation{chollet2017xception,he2016deep}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}CNN-Based Detection}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Positioning of This Study}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Attention and Explainability}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-F}}Research Gap and Scope}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}Methodology}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}System Overview}{2}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Proposed video detection workflow from upload and facial preprocessing to classification and visual explanation.}}{2}{}\protected@file@percent }
-\newlabel{fig:workflow}{{1}{2}{}{figure.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Conceptual CNN and CBAM architecture. The final diagram should reflect the selected implementation.}}{2}{}\protected@file@percent }
-\newlabel{fig:architecture}{{2}{2}{}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}CNN Architecture}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Training Objective}{2}{}\protected@file@percent }
-\newlabel{eq:bce}{{1}{2}{}{equation.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Inference}{2}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Application Architecture}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Video Sampling and Preprocessing}{2}{}\protected@file@percent }
+\newlabel{eq:face-preprocessing}{{1}{2}{}{equation.1}{}}
+\newlabel{eq:normalization}{{2}{2}{}{equation.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}CNN Feature Extraction and CBAM}{2}{}\protected@file@percent }
+\newlabel{eq:convolution}{{3}{2}{}{equation.3}{}}
+\newlabel{eq:channel-attention}{{4}{2}{}{equation.4}{}}
+\newlabel{eq:spatial-attention}{{5}{2}{}{equation.5}{}}
+\citation{selvaraju2017gradcam}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Proposed video-detection pipeline. CBAM refines spatial feature maps within each sampled frame; Grad-CAM uses the target-class score and convolutional activations to produce a selected-frame explanation.}}{3}{}\protected@file@percent }
+\newlabel{fig:architecture}{{1}{3}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Training Objective}{3}{}\protected@file@percent }
+\newlabel{eq:bce}{{6}{3}{}{equation.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Inference}{3}{}\protected@file@percent }
+\newlabel{eq:frame-probability}{{7}{3}{}{equation.7}{}}
+\newlabel{eq:video-aggregation}{{8}{3}{}{equation.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Grad-CAM Explainability}{3}{}\protected@file@percent }
+\newlabel{eq:gradcam}{{9}{3}{}{equation.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Application Architecture}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Setup}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Dataset and Splits}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Implementation Details}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Evaluation Metrics}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Ablation, Generalization, and Robustness}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Evaluation results; populate this figure only with measurements from completed experiments.}}{3}{}\protected@file@percent }
-\newlabel{fig:results}{{3}{3}{}{figure.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Results and Discussion}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Limitations}{3}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Binary confusion matrix; the manipulated class is positive.}}{4}{}\protected@file@percent }
+\newlabel{tab:confusion-matrix}{{I}{4}{}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Evaluation Metrics}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Ablation, Generalization, and Robustness}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Results and Discussion}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Limitations}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion}{4}{}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{references}
-\gdef \@abspage@last{4}
+\bibcite{rossler2019faceforensics}{1}
+\bibcite{li2020celebdf}{2}
+\bibcite{chollet2017xception}{3}
+\bibcite{he2016deep}{4}
+\bibcite{afchar2018mesonet}{5}
+\bibcite{woo2018cbam}{6}
+\bibcite{selvaraju2017gradcam}{7}
+\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\gdef \@abspage@last{5}

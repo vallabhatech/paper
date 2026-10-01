@@ -1,39 +1,117 @@
 \section{Methodology}
 
 \subsection{System Overview}
-The proposed system accepts a video through a web interface and processes it through a FastAPI backend. The backend extracts frames, detects and crops facial regions, resizes and normalizes face images, and passes them to the classifier. The model produces frame-level predictions; a video-level prediction is then formed by aggregating those scores. The aggregation rule, frame-sampling rate, face detector, input dimensions, and behavior when no face is detected must be fixed and reported by the implementation. Data augmentation is applied during training only, with transformations selected to preserve the class label. The prediction, confidence score, and selected Grad-CAM visualization are returned to the frontend for display.
+Given an input video, the system samples frames, detects and crops faces, normalizes the crops, and applies a CNN with CBAM to obtain frame-level scores. The valid frame scores are aggregated into a video-level prediction. Grad-CAM is generated for selected frames, and the backend returns the prediction, score, and visualization to the frontend. CBAM operates on feature channels and spatial locations within a frame; it is not a temporal-attention module.
 
-\begin{figure}[t]
+\begin{figure*}[t]
     \centering
-    \IfFileExists{figures/workflow.png}{
-        \includegraphics[width=\linewidth]{workflow.png}
-    }{\fbox{\parbox{0.9\linewidth}{\centering Add the workflow diagram as\\\texttt{figures/workflow.png}}}}
-    \caption{Proposed video detection workflow from upload and facial preprocessing to classification and visual explanation.}
-    \label{fig:workflow}
-\end{figure}
-
-\subsection{CNN Architecture}
-The detector is designed as a CNN backbone augmented with CBAM. For an intermediate feature tensor, CBAM first infers channel-wise weights and then spatial weights, refining the features before classification \cite{woo2018cbam}. The project description identifies Xception and ResNet as candidate backbones but does not specify which one was selected, nor does it provide the classifier head, input dimensions, initialization, or parameter count. These details must be recorded for a reproducible implementation; no particular backbone or trained configuration is assumed here. The ablation model should use the same backbone, classifier, data, and training protocol, with CBAM as the only architectural difference. Fig.~\ref{fig:architecture} is optional.
-
-\begin{figure}[t]
-    \centering
-    \IfFileExists{figures/architecture.png}{
-        \includegraphics[width=\linewidth]{architecture.png}
-    }{\fbox{\parbox{0.9\linewidth}{\centering Add the architecture diagram as\\\texttt{figures/architecture.png}}}}
-    \caption{Conceptual CNN and CBAM architecture. The final diagram should reflect the selected implementation.}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=0.28cm,
+        stage/.style={draw,rounded corners=1pt,align=center,text width=1.75cm,minimum height=0.82cm,inner sep=2pt,font=\scriptsize},
+        auxiliary/.style={draw,rounded corners=1pt,align=center,text width=2.35cm,minimum height=0.68cm,inner sep=2pt,font=\scriptsize},
+        flow/.style={-{Latex[length=1.6mm]},thick},
+        explain/.style={-{Latex[length=1.6mm]},dashed,thick}
+    ]
+        \node[stage] (upload) {Video\\upload};
+        \node[stage,right=of upload] (sample) {Frame\\sampling};
+        \node[stage,right=of sample] (face) {Face detection,\\alignment, crop};
+        \node[stage,right=of face] (preprocess) {Resize, normalize,\\training augmentation};
+        \node[stage,right=of preprocess] (cbam) {CNN backbone\\+ CBAM};
+        \node[stage,right=of cbam] (framescore) {Frame-level\\fake scores};
+        \node[stage,right=of framescore] (aggregate) {Mean aggregation\\+ threshold};
+        \node[stage,right=of aggregate] (prediction) {Video label\\+ confidence};
+        \node[auxiliary,below=9mm of framescore] (gradcam) {Grad-CAM\\selected-frame heatmap};
+        \draw[flow] (upload) -- (sample);
+        \draw[flow] (sample) -- (face);
+        \draw[flow] (face) -- (preprocess);
+        \draw[flow] (preprocess) -- (cbam);
+        \draw[flow] (cbam) -- (framescore);
+        \draw[flow] (framescore) -- (aggregate);
+        \draw[flow] (aggregate) -- (prediction);
+        \draw[explain] (framescore.south) -- (gradcam.north);
+    \end{tikzpicture}%
+    }
+    \caption{Proposed video-detection pipeline. CBAM refines spatial feature maps within each sampled frame; Grad-CAM uses the target-class score and convolutional activations to produce a selected-frame explanation.}
     \label{fig:architecture}
-\end{figure}
+\end{figure*}
+
+\subsection{Video Sampling and Preprocessing}
+Let a video be represented by the sampled frames $V=\{I_t\}_{t=1}^{T}$, where $T$ is the number of sampled frames. A face detector $\mathcal{D}$ and alignment/cropping operator $\mathcal{A}$ produce the facial input
+\begin{equation}
+    F_t=\mathcal{A}(\mathcal{D}(I_t)).
+    \label{eq:face-preprocessing}
+\end{equation}
+The implementation must define how it selects a face when multiple detections occur and how it handles frames with no valid face. After resizing, a pixel value $x_{c,u,v}\in[0,255]$ may be scaled and standardized channel-wise as
+\begin{equation}
+    \tilde{x}_{c,u,v}=\frac{x_{c,u,v}/255-\mu_c}{\sigma_c},
+    \label{eq:normalization}
+\end{equation}
+where $\mu_c$ and $\sigma_c$ are the selected channel mean and standard deviation; setting $\mu_c=0$ and $\sigma_c=1$ gives simple scaling to $[0,1]$. Their actual values and the input resolution must be reported. During training, augmentation is represented by $\tilde{x}'=\mathcal{T}(\tilde{x})$, where $\mathcal{T}$ is sampled from label-preserving transformations such as horizontal flipping, brightness/contrast changes, or compression simulation. Augmentation is not applied to validation or test data, except in explicitly defined robustness experiments.
+
+\subsection{CNN Feature Extraction and CBAM}
+A convolutional layer maps an input feature tensor $X$ to output feature maps $Y$; for output channel $o$,
+\begin{equation}
+    Y_{o,i,j}=\sum_{c=1}^{C}\sum_{m=0}^{k_h-1}\sum_{n=0}^{k_w-1}
+    K_{o,c,m,n}X_{c,i+m,j+n}+b_o,
+    \label{eq:convolution}
+\end{equation}
+where $K$ and $b$ denote learned kernels and biases. A rectified linear unit applies $\operatorname{ReLU}(z)=\max(0,z)$. The backbone therefore learns hierarchical spatial representations; the exact backbone and CBAM insertion point are implementation choices that must be reported. Xception and ResNet are candidate backbones \cite{chollet2017xception,he2016deep}, but the supplied project description does not identify the selected network, classifier head, initialization, input dimensions, or parameter count. The architecture in Fig.~\ref{fig:architecture} is therefore conceptual and must be checked against the final implementation.
+
+For an intermediate feature tensor $F\in\mathbb{R}^{C\times H\times W}$, CBAM first computes channel attention using spatial average and maximum pooling and a shared multilayer perceptron:
+\begin{equation}
+    \begin{aligned}
+        M_c(F)&=\sigma\!\left(\operatorname{MLP}(\operatorname{AvgPool}(F))\right.\\
+        &\qquad\left.+\operatorname{MLP}(\operatorname{MaxPool}(F))\right),\\
+        F'&=M_c(F)\otimes F.
+    \end{aligned}
+    \label{eq:channel-attention}
+\end{equation}
+Here $\sigma$ is the sigmoid function, and $\otimes$ denotes broadcast element-wise multiplication. Channel attention reweights feature channels. Spatial attention then computes a two-dimensional attention map:
+\begin{equation}
+    \begin{aligned}
+        M_s(F')&=\sigma\!\left(f^{7\times7}
+        [\operatorname{AvgPool}_c(F');\operatorname{MaxPool}_c(F')]\right),\\
+        F''&=M_s(F')\otimes F'.
+    \end{aligned}
+    \label{eq:spatial-attention}
+\end{equation}
+Here pooling is across channels, $[\,;\,]$ denotes concatenation, and $f^{7\times7}$ is a convolution with a $7\times7$ kernel. Thus channel attention addresses which features are informative, while spatial attention addresses where they are informative within a frame. These equations describe CBAM and do not imply that it models relationships across video frames.
 
 \subsection{Training Objective}
-For binary classification, a common objective is binary cross-entropy:
+For binary classification, let $y_i\in\{0,1\}$ be the label and $p_i$ the predicted probability of the fake class for training example $i$. The binary cross-entropy objective is
 \begin{equation}
-    \mathcal{L}=-\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log(p_i)+(1-y_i)\log(1-p_i)\right],
+    \mathcal{L}_{\mathrm{BCE}}=-\frac{1}{N}\sum_{i=1}^{N}
+    \left[y_i\log(p_i)+(1-y_i)\log(1-p_i)\right],
     \label{eq:bce}
 \end{equation}
-where $N$ is the number of training examples, $y_i\in\{0,1\}$ is the ground-truth label, and $p_i$ is the predicted probability for class 1. Binary cross-entropy is the intended objective for binary classification; the final report should confirm the loss and any class weighting used by the training code.
+where $N$ is the number of training examples. Any class weighting or alternative reduction used in training must be stated alongside the loss.
 
 \subsection{Inference}
-For each detected face, the classifier returns a score for the manipulated class. A decision threshold converts this score to a frame-level label, and an aggregation rule combines frame scores into the video-level confidence and label. Neither the threshold nor the aggregation rule is specified in the supplied project description, so both are implementation details that must be stated before reporting video-level metrics. Grad-CAM is computed for a selected convolutional layer and overlaid on the corresponding face crop to visualize regions contributing to the prediction \cite{selvaraju2017gradcam}. Heatmaps are explanatory visualizations and are not independent evidence of manipulation.
+After CBAM refinement, global average pooling produces a feature vector $h_t$. A binary classifier computes a logit $z_t=\mathbf{w}^{\top}h_t+b$ and fake-class probability
+\begin{equation}
+    p_t=P(y_t=1\mid F_t)=\sigma(z_t)=\frac{1}{1+e^{-z_t}}.
+    \label{eq:frame-probability}
+\end{equation}
+The score is a model probability estimate, not proof of manipulation. Let $\mathcal{T}_v$ be the set of valid sampled frames for video $v$, with $N_v=|\mathcal{T}_v|$. Mean-probability aggregation gives
+\begin{equation}
+    P_v=\frac{1}{N_v}\sum_{t\in\mathcal{T}_v}p_t,\qquad
+    \hat{y}_v=\mathbb{1}[P_v\geq\tau],
+    \label{eq:video-aggregation}
+\end{equation}
+where $\tau$ is a decision threshold selected using the validation set. Mean aggregation is the protocol described here; the final implementation must use and report its actual rule, threshold, frame-sampling policy, and handling of videos with no valid faces.
+
+\subsection{Grad-CAM Explainability}
+For target class $c$, let $A^k$ denote the $k$-th feature map of a selected convolutional layer, $y^c$ the class score, and $Z$ the number of spatial locations. Grad-CAM computes the feature-map importance weights and heatmap as
+\begin{equation}
+    \begin{aligned}
+        \alpha_k^c&=\frac{1}{Z}\sum_i\sum_j
+        \frac{\partial y^c}{\partial A_{ij}^k},\\
+        L_{\mathrm{Grad-CAM}}^c&=\operatorname{ReLU}\!\left(\sum_k\alpha_k^cA^k\right).
+    \end{aligned}
+    \label{eq:gradcam}
+\end{equation}
+The heatmap is resized and overlaid on the corresponding face crop for visualization. It indicates image regions that influence the model score; it is not independent evidence that those regions contain a manipulation artifact \cite{selvaraju2017gradcam}.
 
 \subsection{Application Architecture}
 The application is organized into a video-upload frontend, a FastAPI service, video and face preprocessing, model inference, Grad-CAM generation, and a result dashboard. The service packages the predicted label, confidence score, and visualization for the frontend. This architecture describes the intended end-to-end workflow; deployment performance, supported file limits, and operational behavior should be reported after they are verified in the running application.

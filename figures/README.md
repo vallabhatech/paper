@@ -1,7 +1,5 @@
-Place the paper's figure assets in this folder using these filenames:
+Place an optional measured-results figure in this folder as:
 
-- `architecture.png`
-- `workflow.png`
 - `results.png`
 
-The LaTeX source shows a labeled placeholder when any of these images is absent. Replace each placeholder with an actual figure before submitting the paper.
+The methodology and architecture diagram are generated directly in LaTeX. The results figure is included only when this file exists; add it only after the corresponding experiments have been run.
